@@ -4,9 +4,9 @@
 ---
 <ul>
   <li>Fish shell</li>
-  <li>Fisher<li>
+  <li>Fisher</li>
   <li>Shellder</li>
-  <li>Nerd font<li>
+  <li>Nerd font</li>
   <li>z for fish</li>
   <li>exa</li>
   <li>ghq</li>
