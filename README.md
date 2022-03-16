@@ -14,4 +14,10 @@
 </ul>
 ## Vim
 ---
+## Misc
+---
+<ul>
+  <li>LazyGit</li>
+</ul>
 ## Guide
+
