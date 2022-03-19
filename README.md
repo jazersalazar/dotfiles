@@ -13,4 +13,5 @@
   <li>peco</li>
   <li>LazyGit</li>
   <li>wslview</li>
+  <li>NVM<li>
 </ul>
