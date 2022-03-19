@@ -19,6 +19,8 @@ alias gr "git restore --staged"
 alias grr "git restore"
 alias gd "git diff --staged"
 alias gc "git commit"
+alias gp "git push"
+alias gpm "git push origin main" 
 alias gl lazygit
 command -qv nvim && alias vim nvim
 
