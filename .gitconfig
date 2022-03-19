@@ -1,3 +1,5 @@
 [user]
 	email = 48846249+jazersalazar@users.noreply.github.com
 	name = Jazer Salazar
+[credential]
+	helper = cache
