@@ -11,13 +11,6 @@
   <li>exa</li>
   <li>ghq</li>
   <li>peco</li>
-</ul>
-## Vim
----
-## Misc
----
-<ul>
   <li>LazyGit</li>
+  <li>wslview</li>
 </ul>
-## Guide
-
