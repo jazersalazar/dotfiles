@@ -5,11 +5,11 @@ end
 
 # WSL
 function os
-    set target (string trim $argv -c '/' -r)
-    switch (echo $target)
-        case ''
-            wslview .
-	case '*'
-	    wslview $target
-    end
+  set target (string trim $argv -c '/' -r)
+  switch (echo $target)
+    case ''
+      wslview .
+    case '*'
+      wslview $target
+  end
 end
