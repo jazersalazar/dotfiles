@@ -50,3 +50,14 @@ set LOCAL_CONFIG (dirname (status --current-filename))/config-local.fish
 if test -f $LOCAL_CONFIG
   source $LOCAL_CONFIG
 end
+
+# WSL
+function os
+    set target (string trim $argv -c '/' -r)
+    switch (echo $target)
+        case ''
+            wslview .
+	case '*'
+	    wslview $target
+    end
+end
