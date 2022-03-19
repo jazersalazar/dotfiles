@@ -7,11 +7,19 @@ set -g theme_color_scheme terminal-dark
 set -g theme_display_user yes
 
 # aliases
+alias c clear
 alias ls "ls -p -G"
 alias la "ls -A"
 alias ll "ls -l"
 alias lla "ll -A"
 alias g git
+alias gs "git status"
+alias ga "git add"
+alias gr "git restore --staged"
+alias grr "git restore"
+alias gd "git diff --staged"
+alias gc "git commit"
+alias gl lazygit
 command -qv nvim && alias vim nvim
 
 set -gx EDITOR nvim
