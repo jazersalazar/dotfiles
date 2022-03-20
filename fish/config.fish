@@ -16,6 +16,7 @@ alias g git
 alias gs "git status"
 alias ga "git add"
 alias gr "git reset"
+alias grs "git restore"
 alias gd "git diff --staged"
 alias gc "git commit"
 alias gp "git push"
