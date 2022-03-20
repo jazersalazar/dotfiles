@@ -17,7 +17,7 @@
 
 ## TODOs
 <ul>
-  <li>Add links to pacakges and tools</li>
+  <li>Add links to packages and tools</li>
   <li>Add a quick guide for setting up tools</li>
 </ul>
 
