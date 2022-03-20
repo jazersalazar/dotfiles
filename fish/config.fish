@@ -20,7 +20,8 @@ alias gd "git diff --staged"
 alias gc "git commit"
 alias gp "git push"
 alias gpm "git push origin main" 
-alias gl lazygit
+alias gl "git log"
+alias lg lazygit
 command -qv nvim && alias vim nvim
 
 set -gx EDITOR nvim
