@@ -2,4 +2,4 @@
 	email = 48846249+jazersalazar@users.noreply.github.com
 	name = Jazer Salazar
 [credential]
-	helper = cache
+	helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager-core.exe
