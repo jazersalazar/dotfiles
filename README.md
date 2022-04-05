@@ -13,6 +13,7 @@
   <li>wslview</li>
   <li>NVM</li>
   <li>Commitizen</li>
+  <li>Git LFS</li>
 </ul>
 
 ## TODOs
