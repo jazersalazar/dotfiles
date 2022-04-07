@@ -23,7 +23,8 @@
 </ul>
 
 ## Setup Guide
-Guide description
+Setup Github Credentials
 ```
-//Add some shell command here
+set -Ux GIT_USER [Username]
+set -Ux GIT_PAT [Personal Access Token]
 ```
