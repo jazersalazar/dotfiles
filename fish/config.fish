@@ -62,7 +62,7 @@ if test -f $LOCAL_CONFIG
   source $LOCAL_CONFIG
 end
 
-# Git Remote
+# Git Remote Create
 function grc
   # Github Repository Name 
   set repo $argv[1]
@@ -90,6 +90,32 @@ function grc
   end
 end
 
+# Git Remote Initialize
+function gri
+  # Github Repository Name 
+  set repo $argv[1]
+
+  # Repositry Visibility
+  set private $argv[2]
+ 
+  # GitHub repos Create API call
+  set GIT_STATUS (curl -H "Authorization: token $GIT_PAT" https://api.github.com/user/repos -d '{"name" : "'$repo'", "private": '$private'}' -o /dev/null -w '%{http_code}\n' -s)
+
+  switch (echo $GIT_STATUS)
+    case 201
+      echo 'Github Repository Created Successfully!'
+      git init
+      git remote add origin https://github.com/$GIT_USER/$repo.git
+      git add -A
+      git commit -m "init commit"
+      git branch -M main
+      git push -u origin main
+   case '*'
+    echo "Github Repository Creation Failed!"
+  end
+end
+
+# Git Remote Delete
 function grd
   # Github Repository Name
   set repo $argv[1]
