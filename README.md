@@ -14,6 +14,7 @@
   <li>NVM</li>
   <li>Commitizen</li>
   <li>Git LFS</li>
+  <li>Tmux</li>
 </ul>
 
 ## TODOs
@@ -28,3 +29,8 @@ Setup Github Credentials
 set -Ux GIT_USER [Username]
 set -Ux GIT_PAT [Personal Access Token]
 ```
+
+Source tmux file
+```
+ tmux source-file ~/.config/tmux/tmux.conf
+ ```
