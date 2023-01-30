@@ -129,3 +129,12 @@ function grd
       echo 'Github Repository Deletion Failed!'
     end
 end
+
+function ide
+	switch (echo $argv[1])
+		case '-h'
+			tmux new-session -d\; split-window -v -p 30\; split-window -h\; select-pane -t 0\;
+		case '*'
+			tmux new-session -d\; split-window -v -p 30\; split-window -h -p 60\; split-window -h -p 50\; select-pane -t 0\;
+	end
+end
