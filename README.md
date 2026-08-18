@@ -12,7 +12,7 @@ The bootstrap installs the command-line tools and language runtimes used by this
 - Rust via `rustup`
 - Java / OpenJDK
 - Git and GitHub CLI
-- Neovim, tmux, Lazygit, and Starship
+- Neovim, tmux with automatic session persistence, Lazygit, and Starship
 - CLI and build tools such as `rg`, `fd`, `fzf`, `bat`, `eza`, `jq`, `zoxide`, and GCC
 
 Docker is provided separately by Docker Desktop for Windows with WSL integration enabled.
@@ -124,7 +124,7 @@ cd ~/dotfiles
 ./bootstrap.sh
 ```
 
-The script installs the development tools and runs `install.sh`, which creates the dotfile symlinks. Existing files or incorrect symlinks are backed up with a timestamp before replacement.
+The script installs the development tools and runs `install.sh`, which creates the dotfile symlinks. Existing files or incorrect symlinks are backed up with a timestamp before replacement. It also installs Tmux Plugin Manager and fetches the plugins declared in `tmux/tmux.conf`.
 
 When setup finishes, close Ubuntu completely and open a new terminal so the shell configuration and updated paths are loaded.
 

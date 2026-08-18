@@ -55,6 +55,17 @@ sudo apt install -y \
 echo
 echo "Base packages installed."
 
+# Ubuntu packages expose fd and bat as fdfind and batcat on some releases.
+mkdir -p "$HOME/.local/bin"
+
+if ! command -v fd >/dev/null 2>&1 && command -v fdfind >/dev/null 2>&1; then
+  ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+fi
+
+if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
+  ln -sf "$(command -v batcat)" "$HOME/.local/bin/bat"
+fi
+
 # ------------------------------------------------------------
 # Node.js / fnm
 # ------------------------------------------------------------
@@ -94,12 +105,12 @@ echo "pnpm: $(pnpm --version)"
 echo
 echo "Setting up Python and uv..."
 
+export PATH="$HOME/.local/bin:$PATH"
+
 if ! command -v uv >/dev/null 2>&1; then
   echo "Installing uv..."
   curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
-
-export PATH="$HOME/.local/bin:$PATH"
 
 echo "uv: $(uv --version)"
 echo "Python: $(python3 --version)"
@@ -127,12 +138,12 @@ echo "GOPATH: $(go env GOPATH)"
 echo
 echo "Setting up Rust..."
 
+export PATH="$HOME/.cargo/bin:$PATH"
+
 if ! command -v rustup >/dev/null 2>&1; then
   echo "Installing rustup..."
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 fi
-
-export PATH="$HOME/.cargo/bin:$PATH"
 
 rustup default stable
 
@@ -271,14 +282,19 @@ echo "Checking Docker..."
 DOCKER_VERSION="Not available"
 
 if command -v docker >/dev/null 2>&1; then
-  DOCKER_VERSION="$(docker --version)"
-  echo "Docker:   $DOCKER_VERSION"
+  if DOCKER_VERSION="$(docker --version 2>/dev/null)"; then
+    echo "Docker:   $DOCKER_VERSION"
 
-  if docker info >/dev/null 2>&1; then
-    echo "✓ Docker daemon reachable"
+    if docker info >/dev/null 2>&1; then
+      echo "✓ Docker daemon reachable"
+    else
+      echo "Warning: Docker CLI exists but the daemon is unavailable."
+      echo "Start Docker Desktop and enable WSL integration for this distro."
+    fi
   else
-    echo "Warning: Docker CLI exists but the daemon is unavailable."
-    echo "Start Docker Desktop and enable WSL integration for this distro."
+    DOCKER_VERSION="Not available"
+    echo "Docker is installed on Windows but unavailable in this WSL distro."
+    echo "Enable Docker Desktop WSL integration for this distro."
   fi
 else
   echo "Docker is not available inside WSL."
@@ -295,6 +311,27 @@ echo "Installing dotfiles..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 "$SCRIPT_DIR/install.sh"
+
+# ------------------------------------------------------------
+# tmux plugins
+# ------------------------------------------------------------
+
+echo
+echo "Setting up tmux plugins..."
+
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+
+if [ ! -x "$TPM_DIR/bin/install_plugins" ]; then
+  if [ -e "$TPM_DIR" ] || [ -L "$TPM_DIR" ]; then
+    echo "Error: $TPM_DIR exists but is not a valid TPM installation."
+    exit 1
+  fi
+
+  echo "Installing Tmux Plugin Manager..."
+  git clone --depth 1 https://github.com/tmux-plugins/tpm "$TPM_DIR"
+fi
+
+"$TPM_DIR/bin/install_plugins"
 
 echo
 echo "========================================"

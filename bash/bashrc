@@ -108,7 +108,7 @@ export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 eval "$(starship init bash)"
 
 # fnm
-FNM_PATH="/home/js/.local/share/fnm"
+FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "$(fnm env --shell bash)"
@@ -143,8 +143,11 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
   eval "$(ssh-agent -s)" >/dev/null
 fi
 
-# Add default SSH key if no identities are loaded
-if ! ssh-add -l >/dev/null 2>&1; then
+# Add the default SSH key if it exists and no identities are loaded
+if [ -f "$HOME/.ssh/id_ed25519" ] && ! ssh-add -l >/dev/null 2>&1; then
   ssh-add ~/.ssh/id_ed25519
 fi
-. "$HOME/.cargo/env"
+
+if [ -f "$HOME/.cargo/env" ]; then
+  . "$HOME/.cargo/env"
+fi
