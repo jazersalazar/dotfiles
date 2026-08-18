@@ -13,7 +13,7 @@ The bootstrap installs the command-line tools and language runtimes used by this
 - Java / OpenJDK
 - Git and GitHub CLI
 - Neovim, tmux with automatic session persistence, Lazygit, and Starship
-- JavaScript and TypeScript debugging with `nvim-dap`, `js-debug-adapter`, and `tsx`
+- JavaScript, TypeScript, and Python debugging with `nvim-dap`, `js-debug-adapter`, `debugpy`, and `tsx`
 - CLI and build tools such as `rg`, `fd`, `fzf`, `bat`, `eza`, `jq`, `zoxide`, and GCC
 
 Docker is provided separately by Docker Desktop for Windows with WSL integration enabled.
