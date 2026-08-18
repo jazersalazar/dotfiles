@@ -170,6 +170,8 @@ git pull
 ./bootstrap.sh
 ```
 
+The bootstrap also upgrades Lazygit when a newer official release is available.
+
 Restart the terminal afterward if shell configuration or paths changed.
 
 # Configuration Mapping

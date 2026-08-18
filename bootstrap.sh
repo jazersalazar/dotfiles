@@ -211,12 +211,22 @@ echo "Neovim: $(nvim --version | head -n 1)"
 echo
 echo "Setting up Lazygit..."
 
-if ! command -v lazygit >/dev/null 2>&1; then
-  echo "Installing Lazygit..."
+LAZYGIT_VERSION="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": *"v\K[^"]*')"
+LAZYGIT_ARCH="$(uname -m | sed -e 's/aarch64/arm64/')"
+LAZYGIT_INSTALLED_VERSION=""
+
+if command -v lazygit >/dev/null 2>&1; then
+  LAZYGIT_INSTALLED_VERSION="$(lazygit --version | grep -oP "(?<=, version=)'?[^,']+" | tr -d "'" || true)"
+fi
+
+if [ "$LAZYGIT_INSTALLED_VERSION" != "$LAZYGIT_VERSION" ]; then
+  if [ -n "$LAZYGIT_INSTALLED_VERSION" ]; then
+    echo "Upgrading Lazygit: $LAZYGIT_INSTALLED_VERSION -> $LAZYGIT_VERSION"
+  else
+    echo "Installing Lazygit..."
+  fi
 
   (
-    LAZYGIT_VERSION="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": *"v\K[^"]*')"
-    LAZYGIT_ARCH="$(uname -m | sed -e 's/aarch64/arm64/')"
     LAZYGIT_TMP="$(mktemp -d)"
 
     trap 'rm -rf "$LAZYGIT_TMP"' EXIT
@@ -225,8 +235,13 @@ if ! command -v lazygit >/dev/null 2>&1; then
       "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LAZYGIT_ARCH}.tar.gz"
 
     tar -xzf "$LAZYGIT_TMP/lazygit.tar.gz" -C "$LAZYGIT_TMP" lazygit
-    sudo install -Dm 755 "$LAZYGIT_TMP/lazygit" /usr/local/bin/lazygit
+    mkdir -p "$HOME/.local/bin"
+    install -m 755 "$LAZYGIT_TMP/lazygit" "$HOME/.local/bin/lazygit"
   )
+
+  hash -r
+else
+  echo "Lazygit is already up to date."
 fi
 
 echo "Lazygit: $(lazygit --version)"
