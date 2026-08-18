@@ -205,6 +205,33 @@ fi
 echo "Neovim: $(nvim --version | head -n 1)"
 
 # ------------------------------------------------------------
+# Lazygit
+# ------------------------------------------------------------
+
+echo
+echo "Setting up Lazygit..."
+
+if ! command -v lazygit >/dev/null 2>&1; then
+  echo "Installing Lazygit..."
+
+  (
+    LAZYGIT_VERSION="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -Po '"tag_name": *"v\K[^"]*')"
+    LAZYGIT_ARCH="$(uname -m | sed -e 's/aarch64/arm64/')"
+    LAZYGIT_TMP="$(mktemp -d)"
+
+    trap 'rm -rf "$LAZYGIT_TMP"' EXIT
+
+    curl -fsSL -o "$LAZYGIT_TMP/lazygit.tar.gz" \
+      "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LAZYGIT_ARCH}.tar.gz"
+
+    tar -xzf "$LAZYGIT_TMP/lazygit.tar.gz" -C "$LAZYGIT_TMP" lazygit
+    sudo install -Dm 755 "$LAZYGIT_TMP/lazygit" /usr/local/bin/lazygit
+  )
+fi
+
+echo "Lazygit: $(lazygit --version)"
+
+# ------------------------------------------------------------
 # Starship
 # ------------------------------------------------------------
 
@@ -226,12 +253,11 @@ echo "Starship: $(starship --version | head -n 1)"
 echo
 echo "Checking Docker..."
 
+DOCKER_VERSION="Not available"
+
 if command -v docker >/dev/null 2>&1; then
-  if command -v docker >/dev/null 2>&1; then
-    echo "Docker:   $(docker --version)"
-  else
-    echo "Docker:   Not available - enable Docker Desktop WSL integration"
-  fi
+  DOCKER_VERSION="$(docker --version)"
+  echo "Docker:   $DOCKER_VERSION"
 
   if docker info >/dev/null 2>&1; then
     echo "✓ Docker daemon reachable"
@@ -269,7 +295,8 @@ echo "Rust:     $(rustc --version)"
 echo "Java:     $(java -version 2>&1 | head -n 1)"
 echo "GitHub:   $(gh --version | head -n 1)"
 echo "Neovim:   $(nvim --version | head -n 1)"
+echo "Lazygit:  $(lazygit --version)"
 echo "Starship: $(starship --version | head -n 1)"
-echo "Docker:   $(docker --version)"
+echo "Docker:   $DOCKER_VERSION"
 echo
 echo "Restart your terminal to ensure all shell configuration is loaded."
