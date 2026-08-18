@@ -32,6 +32,8 @@ sudo apt install -y \
   curl \
   wget \
   python3 \
+  python3-venv \
+  postgresql-client \
   unzip \
   zip \
   git \
@@ -348,6 +350,7 @@ echo
 echo "Node:     $(node --version)"
 echo "pnpm:     $(pnpm --version)"
 echo "tsx:      $(tsx --version | head -n 1)"
+echo "Postgres: $(psql --version)"
 echo "Python:   $(python3 --version)"
 echo "uv:       $(uv --version)"
 echo "Go:       $(go version)"

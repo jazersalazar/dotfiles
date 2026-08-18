@@ -14,6 +14,7 @@ The bootstrap installs the command-line tools and language runtimes used by this
 - Git and GitHub CLI
 - Neovim, tmux with automatic session persistence, Lazygit, and Starship
 - JavaScript, TypeScript, and Python debugging with `nvim-dap`, `js-debug-adapter`, `debugpy`, and `tsx`
+- PostgreSQL client tools and Neovim SQL support with Dadbod
 - CLI and build tools such as `rg`, `fd`, `fzf`, `bat`, `eza`, `jq`, `zoxide`, and GCC
 
 Docker is provided separately by Docker Desktop for Windows with WSL integration enabled.
@@ -135,12 +136,19 @@ Authenticate the GitHub CLI after reopening the terminal:
 gh auth login
 ```
 
+Supabase CLI is intentionally installed per project so its version is pinned with the application. From a Supabase project:
+
+```bash
+pnpm add --save-dev supabase
+pnpm supabase --version
+```
+
 ## 8. Verify the Setup
 
 Check the main tools:
 
 ```bash
-for cmd in git gh nvim tmux lazygit starship node pnpm python3 uv go rustc cargo java docker; do
+for cmd in git gh nvim tmux lazygit starship node pnpm tsx python3 uv go rustc cargo java psql pg_dump docker; do
     printf "%-12s " "$cmd"
     command -v "$cmd" || echo "NOT FOUND"
 done
