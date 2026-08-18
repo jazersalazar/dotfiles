@@ -1,25 +1,33 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Installing dotfiles from: $DOTFILES"
-
-mkdir -p "$HOME/.config"
-mkdir -p "$HOME/.config/lazygit"
+echo
 
 link() {
-    local source="$1"
-    local target="$2"
+  local source="$1"
+  local target="$2"
 
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
-        echo "Backing up $target -> ${target}.backup"
-        mv "$target" "${target}.backup"
-    fi
+  mkdir -p "$(dirname "$target")"
 
-    ln -sfn "$source" "$target"
-    echo "Linked $target"
+  # Already linked correctly
+  if [ -L "$target" ] && [ "$(readlink -f "$target")" = "$(readlink -f "$source")" ]; then
+    echo "✓ Already linked: $target"
+    return
+  fi
+
+  # Backup an existing real file/directory or incorrect symlink
+  if [ -e "$target" ] || [ -L "$target" ]; then
+    local backup="${target}.backup.$(date +%Y%m%d-%H%M%S)"
+    echo "Backing up: $target -> $backup"
+    mv "$target" "$backup"
+  fi
+
+  ln -s "$source" "$target"
+  echo "✓ Linked: $target -> $source"
 }
 
 link "$DOTFILES/bash/bashrc" "$HOME/.bashrc"
@@ -30,4 +38,4 @@ link "$DOTFILES/nvim" "$HOME/.config/nvim"
 link "$DOTFILES/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
 
 echo
-echo "Dotfiles installed."
+echo "Dotfiles installed successfully."
