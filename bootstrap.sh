@@ -98,6 +98,13 @@ fi
 
 echo "pnpm: $(pnpm --version)"
 
+if ! command -v tsx >/dev/null 2>&1; then
+  echo "Installing tsx..."
+  npm install --global tsx
+fi
+
+echo "tsx:  $(tsx --version | head -n 1)"
+
 # ------------------------------------------------------------
 # Python / uv
 # ------------------------------------------------------------
@@ -340,6 +347,7 @@ echo "========================================"
 echo
 echo "Node:     $(node --version)"
 echo "pnpm:     $(pnpm --version)"
+echo "tsx:      $(tsx --version | head -n 1)"
 echo "Python:   $(python3 --version)"
 echo "uv:       $(uv --version)"
 echo "Go:       $(go version)"
