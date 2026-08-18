@@ -1,0 +1,22 @@
+# Secrets / environment
+.env
+.env.*
+*.pem
+*.key
+
+# SSH
+.ssh/
+
+# Shell history
+.bash_history
+.zsh_history
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.bak

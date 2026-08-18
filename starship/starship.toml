@@ -1,0 +1,66 @@
+palette = "dracula"
+add_newline = true
+
+format = """
+[](purple)\
+$directory\
+[](fg:purple bg:pink)\
+$git_branch\
+$git_status\
+[](fg:pink bg:cyan)\
+$nodejs\
+$python\
+[](fg:cyan bg:current_line)\
+$cmd_duration\
+[](fg:current_line)\
+$line_break\
+$character
+"""
+
+[palettes.dracula]
+background = "#282A36"
+current_line = "#44475A"
+foreground = "#F8F8F2"
+comment = "#6272A4"
+cyan = "#8BE9FD"
+green = "#50FA7B"
+orange = "#FFB86C"
+pink = "#FF79C6"
+purple = "#BD93F9"
+red = "#FF5555"
+yellow = "#F1FA8C"
+
+[directory]
+style = "fg:background bg:purple bold"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
+
+[git_branch]
+symbol = " "
+style = "fg:background bg:pink bold"
+format = "[ $symbol$branch ]($style)"
+
+[git_status]
+style = "fg:background bg:pink bold"
+format = "[$all_status$ahead_behind ]($style)"
+
+[nodejs]
+symbol = " "
+style = "fg:background bg:cyan bold"
+format = "[ $symbol$version ]($style)"
+
+[python]
+symbol = " "
+style = "fg:background bg:cyan bold"
+format = "[ $symbol$version ]($style)"
+
+[cmd_duration]
+min_time = 1000
+style = "fg:foreground bg:current_line"
+format = "[  $duration ]($style)"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold purple)"
