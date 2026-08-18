@@ -11,7 +11,7 @@ The bootstrap installs the command-line tools and language runtimes used by this
 - Go
 - Rust via `rustup`
 - Java / OpenJDK
-- Git and GitHub CLI
+- Git, GitHub CLI, and OpenAI Codex CLI
 - Neovim, tmux with automatic session persistence, Lazygit, and Starship
 - JavaScript, TypeScript, and Python debugging with `nvim-dap`, `js-debug-adapter`, `debugpy`, and `tsx`
 - PostgreSQL client tools and Neovim SQL support with Dadbod
@@ -136,6 +136,13 @@ Authenticate the GitHub CLI after reopening the terminal:
 gh auth login
 ```
 
+Launch Codex from a project directory and sign in with ChatGPT when prompted:
+
+```bash
+cd ~/projects/YOUR_PROJECT
+codex
+```
+
 Supabase CLI is intentionally installed per project so its version is pinned with the application. From a Supabase project:
 
 ```bash
@@ -148,7 +155,7 @@ pnpm supabase --version
 Check the main tools:
 
 ```bash
-for cmd in git gh nvim tmux lazygit starship node pnpm tsx python3 uv go rustc cargo java psql pg_dump docker; do
+for cmd in git gh codex nvim tmux lazygit starship node pnpm tsx python3 uv go rustc cargo java psql pg_dump docker; do
     printf "%-12s " "$cmd"
     command -v "$cmd" || echo "NOT FOUND"
 done

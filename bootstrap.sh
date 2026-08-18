@@ -203,6 +203,21 @@ fi
 echo "GitHub CLI: $(gh --version | head -n 1)"
 
 # ------------------------------------------------------------
+# Codex CLI
+# ------------------------------------------------------------
+
+echo
+echo "Setting up Codex CLI..."
+
+if ! command -v codex >/dev/null 2>&1; then
+  echo "Installing Codex CLI..."
+  curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  hash -r
+fi
+
+echo "Codex CLI: $(codex --version)"
+
+# ------------------------------------------------------------
 # Neovim
 # ------------------------------------------------------------
 
@@ -357,6 +372,7 @@ echo "Go:       $(go version)"
 echo "Rust:     $(rustc --version)"
 echo "Java:     $(java -version 2>&1 | head -n 1)"
 echo "GitHub:   $(gh --version | head -n 1)"
+echo "Codex:    $(codex --version)"
 echo "Neovim:   $(nvim --version | head -n 1)"
 echo "Lazygit:  $(lazygit --version)"
 echo "Starship: $(starship --version | head -n 1)"
