@@ -8,3 +8,81 @@ alias l='eza --icons=auto'
 # Keep cat unchanged for compatibility.
 # Use bat directly when you want syntax highlighting.
 alias b='bat'
+
+# Tmux workspace shortcuts
+tmux-ide() {
+  local session_path="${1:-$PWD}"
+
+  if ! session_path="$(cd -- "$session_path" 2>/dev/null && pwd -P)"; then
+    printf 'tmux-ide: directory does not exist: %s\n' "$session_path" >&2
+    return 1
+  fi
+  local session_key
+  session_key="$(printf '%s' "$session_path" | cksum | cut -d ' ' -f 1)"
+  # Every invocation gets its own session: the path hash names it after the
+  # project, and the shell process and nanosecond timestamp keep a second
+  # terminal in the same directory from sharing the first one's session. Nothing
+  # reuses an existing session, so nothing here looks one up.
+  local session_name="ide-${session_key}-$$-$(date +%s%N)"
+
+  # Maximize before creating the detached session so tmux calculates pane
+  # percentages from the terminal's final dimensions.
+  printf '\033[9;1t'
+  sleep 0.2
+  local terminal_cols terminal_lines
+  terminal_cols="$(tput cols)"
+  terminal_lines="$(tput lines)"
+
+  # A tmux server keeps its own environment. Refresh PATH so tools installed
+  # during this shell session (including Codex and Claude) work immediately.
+  tmux set-environment -g PATH "$PATH"
+
+  # When already inside tmux, turn the current one-pane window into the IDE.
+  # This keeps one client and one status bar instead of attaching nested tmux.
+  if [ -n "${TMUX:-}" ]; then
+    local current_window pane_count nvim_pane codex_pane shell_pane
+    current_window="$(tmux display-message -p '#{session_name}:#{window_index}')"
+    pane_count="$(tmux display-message -p '#{window_panes}')"
+
+    if [ "$pane_count" -ne 1 ]; then
+      printf 'tmux-ide: current window already has %s panes; open an empty window with Prefix + c first\n' "$pane_count" >&2
+      return 1
+    fi
+
+    nvim_pane="$(tmux display-message -p '#{pane_id}')"
+    tmux rename-window -t "$current_window" workspace
+    codex_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path" codex)"
+    tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" claude
+    shell_pane="$(tmux split-window -v -p 35 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path")"
+    tmux split-window -h -p 50 -t "$shell_pane" -c "$session_path" lazygit
+    tmux resize-pane -t "$codex_pane" -x 30%
+    tmux resize-pane -t "$shell_pane" -y 35%
+    tmux select-pane -t "$nvim_pane"
+
+    cd -- "$session_path" || return 1
+    nvim
+    return
+  fi
+
+  # Five-pane IDE layout: Neovim above a shell and Lazygit in the left 65%,
+  # with Codex and Claude Code stacked in the right 30%.
+  local nvim_pane codex_pane shell_pane
+
+  # Keep the pane open after Neovim exits so it remains available as a shell.
+  nvim_pane="$(tmux new-session -d -x "$terminal_cols" -y "$terminal_lines" -P -F '#{pane_id}' -s "$session_name" -c "$session_path" -n workspace 'nvim; exec "${SHELL:-bash}"')"
+  codex_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path" codex)"
+  tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" claude
+  shell_pane="$(tmux split-window -v -p 35 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path")"
+  tmux split-window -h -p 50 -t "$shell_pane" -c "$session_path" lazygit
+
+  # Reassert the intended proportions after all nested splits exist.
+  tmux resize-pane -t "$codex_pane" -x 30%
+  tmux resize-pane -t "$shell_pane" -y 35%
+  tmux select-pane -t "$nvim_pane"
+
+  tmux attach-session -t "$session_name"
+}
+
+tmux-close() {
+  tmux kill-window
+}

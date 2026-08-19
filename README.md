@@ -243,6 +243,24 @@ The prefix is tmux's default, `Ctrl+b`. Press the prefix, release it, and then p
 | `Ctrl+b`, then `h` / `j` / `k` / `l` | Select the pane left / down / up / right |
 | `Ctrl+b`, then `H` / `J` / `K` / `L` | Resize the pane left / down / up / right by five cells |
 
+Create or attach to a persistent IDE layout for the current project directory:
+
+```bash
+tmux-ide
+```
+
+The layout uses a wide left column: Neovim occupies its upper 65%, with a shell and Lazygit below it. Codex and Claude Code are stacked in the narrower right column. Each invocation gets its own session, named after the project directory. Pass a directory to start there:
+
+```bash
+tmux-ide ~/projects/my-app
+```
+
+Close the current tmux window with one command:
+
+```bash
+tmux-close
+```
+
 ## Neovim and tmux Navigation
 
 The `vim-tmux-navigator` configuration provides navigation across Neovim splits and tmux panes:
