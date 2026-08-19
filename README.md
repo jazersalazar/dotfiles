@@ -222,6 +222,9 @@ Restart the terminal afterward if shell configuration or paths changed.
 | `bash/bashrc` | `~/.bashrc` |
 | `bash/bash_aliases` | `~/.bash_aliases` |
 | `tmux/tmux.conf` | `~/.tmux.conf` |
+| `tmux/quote.sh` | `~/.tmux/quote.sh` |
+| `tmux/quote-rotate.sh` | `~/.tmux/quote-rotate.sh` |
+| `tmux/quotes.txt` | `~/.tmux/quotes.txt` |
 | `starship/starship.toml` | `~/.config/starship.toml` |
 | `nvim/` | `~/.config/nvim` |
 | `lazygit/config.yml` | `~/.config/lazygit/config.yml` |
