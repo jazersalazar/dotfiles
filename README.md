@@ -2,16 +2,15 @@
 
 Dotfiles and setup scripts for a development environment running Ubuntu on WSL2.
 
-The bootstrap installs the command-line tools and language runtimes used by this environment, then links the repository configuration into the home directory.
+The installer installs the command-line tools and language runtimes used by this environment, then links the repository configuration into the home directory.
 
 ## What Gets Installed
 
 - Node.js via `fnm`, npm, and pnpm
 - Python and `uv`
-- Go
-- Rust via `rustup`
-- Java / OpenJDK
-- Git, GitHub CLI, and OpenAI Codex CLI
+- Optional Go, Rust via `rustup`, and Java / OpenJDK
+- Git and GitHub CLI
+- Optional AI coding tools: OpenAI Codex CLI and Claude Code
 - Neovim, tmux with automatic session persistence, Lazygit, and Starship
 - JavaScript, TypeScript, and Python debugging with `nvim-dap`, `js-debug-adapter`, `debugpy`, and `tsx`
 - PostgreSQL client tools and Neovim SQL support with Dadbod
@@ -123,10 +122,33 @@ From the repository:
 
 ```bash
 cd ~/dotfiles
-./bootstrap.sh
+./install.sh
 ```
 
-The script installs the development tools and runs `install.sh`, which creates the dotfile symlinks. Existing files or incorrect symlinks are backed up with a timestamp before replacement. It also installs Tmux Plugin Manager and fetches the plugins declared in `tmux/tmux.conf`.
+The script installs the development tools and runs `link-dotfiles.sh`, which creates the dotfile symlinks. Existing files or incorrect symlinks are backed up with a timestamp before replacement. It also installs Tmux Plugin Manager and fetches the plugins declared in `tmux/tmux.conf`.
+
+The base development tools are always installed. Codex CLI and Claude Code are optional: when run in a terminal, the installer asks about each one, and pressing Enter accepts the default of installing it. Flags can select them explicitly for unattended or repeatable setup:
+
+```bash
+./install.sh --with-codex --with-claude
+./install.sh --without-codex
+./install.sh --without-claude
+./install.sh --without-codex --without-claude
+```
+
+When no terminal input is available, all optional components are installed by default unless a `--without-*` flag is supplied.
+
+To install only the base environment without either AI coding tool:
+
+```bash
+./install.sh --without-codex --without-claude --without-go --without-rust --without-java
+```
+
+To install only selected optional components, combine the relevant flags. For example:
+
+```bash
+./install.sh --with-codex --with-claude --with-rust --without-go --without-java
+```
 
 When setup finishes, close Ubuntu completely and open a new terminal so the shell configuration and updated paths are loaded.
 
@@ -178,21 +200,21 @@ git status
 
 # Updating the Environment
 
-Pull the latest changes and rerun the bootstrap:
+Pull the latest changes and rerun the installer:
 
 ```bash
 cd ~/dotfiles
 git pull
-./bootstrap.sh
+./install.sh
 ```
 
-The bootstrap also upgrades Lazygit when a newer official release is available.
+The installer also upgrades Lazygit when a newer official release is available.
 
 Restart the terminal afterward if shell configuration or paths changed.
 
 # Configuration Mapping
 
-`install.sh` creates these symlinks:
+`link-dotfiles.sh` creates these symlinks:
 
 | Repository file | Installed location |
 |---|---|
