@@ -252,6 +252,19 @@ echo "uv: $(uv --version)"
 echo "Python: $(python3 --version)"
 
 # ------------------------------------------------------------
+# commitizen
+# ------------------------------------------------------------
+
+echo
+echo "Setting up commitizen..."
+
+# Installed as a uv tool so it gets its own environment instead of landing in
+# the system Python or the Node globals. Re-running is a no-op.
+uv tool install commitizen
+
+echo "commitizen: $(cz version 2>/dev/null || echo 'not on PATH yet')"
+
+# ------------------------------------------------------------
 # Go
 # ------------------------------------------------------------
 

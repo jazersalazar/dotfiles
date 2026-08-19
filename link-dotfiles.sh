@@ -40,6 +40,8 @@ link "$DOTFILES/tmux/quotes.txt" "$HOME/.tmux/quotes.txt"
 link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
 link "$DOTFILES/nvim" "$HOME/.config/nvim"
 link "$DOTFILES/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
+link "$DOTFILES/.cz.toml" "$HOME/.config/commitizen/cz.toml"
+link "$DOTFILES/bin/cz-with-config" "$HOME/.local/bin/cz-with-config"
 
 # The repository's own git hooks. .git/hooks is not tracked, so point git at the
 # versioned directory rather than copying anything into it.

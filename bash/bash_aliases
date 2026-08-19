@@ -9,6 +9,16 @@ alias l='eza --icons=auto'
 # Use bat directly when you want syntax highlighting.
 alias b='bat'
 
+# Commit message wizard. The rule for which config applies lives in
+# bin/cz-with-config so the shell and the lazygit binding cannot drift apart.
+cz() {
+  if command -v cz-with-config >/dev/null 2>&1; then
+    cz-with-config "$@"
+  else
+    command cz "$@"
+  fi
+}
+
 # Tmux workspace shortcuts
 tmux-ide() {
   local session_path="${1:-$PWD}"

@@ -33,3 +33,13 @@ gui:
 
     authorColors:
       "*": "#bd93f9"
+
+# Commit through commitizen instead of lazygit's own message editor. Replaces
+# the stock "commit using git editor" binding; lazygit's own commit panel on `c`
+# is untouched.
+customCommands:
+  - key: "C"
+    context: "files"
+    description: "Commit with commitizen"
+    command: "cz-with-config commit"
+    subprocess: true

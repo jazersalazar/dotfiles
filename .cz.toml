@@ -1,0 +1,61 @@
+# commitizen configuration for `cz commit`. commitizen only reads config from the
+# current directory, so this lives at the repository root; link-dotfiles.sh also
+# links it to ~/.config/commitizen/cz.toml, which the cz wrapper in
+# bash/bash_aliases passes to --config when a repository has no config of its own.
+#
+# The type list and schema_pattern here are kept in step with
+# .githooks/commit-msg deliberately: the wizard formats the message, and the
+# hook is what still catches a hand-written `git commit -m`.
+
+[tool.commitizen]
+name = "cz_customize"
+
+[tool.commitizen.customize]
+schema = "<type>[(scope)][!]: <description>"
+schema_pattern = "^(feat|fix|chore|docs|refactor|test|perf|build|ci|style|revert)(\\([a-z0-9./-]+\\))?!?: .+"
+example = "feat: type quotes in the tmux status bar"
+message_template = "{{change_type}}{% if scope %}({{scope}}){% endif %}{% if breaking %}!{% endif %}: {{subject}}{% if body %}\n\n{{body}}{% endif %}{% if footer %}\n\n{{footer}}{% endif %}"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+message = "Type of change"
+choices = [
+  { value = "feat", name = "feat:     a new capability" },
+  { value = "fix", name = "fix:      a bug fix" },
+  { value = "refactor", name = "refactor: restructuring, no behaviour change" },
+  { value = "docs", name = "docs:     documentation only" },
+  { value = "chore", name = "chore:    housekeeping, no src or test change" },
+  { value = "build", name = "build:    build, packaging or dependencies" },
+  { value = "style", name = "style:    formatting only" },
+  { value = "perf", name = "perf:     a performance improvement" },
+  { value = "test", name = "test:     tests only" },
+  { value = "ci", name = "ci:       CI configuration" },
+  { value = "revert", name = "revert:   revert an earlier commit" },
+]
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "scope"
+message = "Scope, lowercase, optional (tmux, nvim, install)"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "Summary: imperative, no trailing period"
+
+[[tool.commitizen.customize.questions]]
+type = "confirm"
+name = "breaking"
+message = "Breaking change?"
+default = false
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Body, optional: what changed and why"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "footer"
+message = "Footer, optional (Refs: #12)"

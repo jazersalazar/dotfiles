@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Runs commitizen with this machine's shared configuration whenever the current
+# repository does not carry one of its own. commitizen reads config only from the
+# current directory, so without this `cz` falls back to its built-in type list,
+# which offers neither chore nor revert.
+#
+# Both surfaces go through this script rather than duplicating the rule: the cz
+# function in bash/bash_aliases, and the lazygit binding, which runs commands
+# through sh and so cannot see a shell function.
+
+set -u
+
+readonly FALLBACK="${XDG_CONFIG_HOME:-$HOME/.config}/commitizen/cz.toml"
+
+if [ -f .cz.toml ] || [ -f cz.toml ] \
+  || grep -qs '^\[tool.commitizen\]' pyproject.toml \
+  || [ ! -f "$FALLBACK" ]; then
+  exec cz "$@"
+fi
+
+exec cz --config "$FALLBACK" "$@"
