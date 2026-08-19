@@ -249,7 +249,7 @@ Create or attach to a persistent IDE layout for the current project directory:
 tmux-ide
 ```
 
-The layout uses a wide left column: Neovim occupies its upper 65%, with a shell and Lazygit below it. Codex and Claude Code are stacked in the narrower right column. Each invocation gets its own session, named after the project directory. Pass a directory to start there:
+The layout uses a wide left column: Neovim occupies its upper 65%, with a shell and Lazygit below it. Codex and Claude Code are stacked in the narrower right column. Each project directory gets its own session, so running it again in the same project reattaches to that session rather than creating another one. Pass a directory to start there:
 
 ```bash
 tmux-ide ~/projects/my-app
