@@ -41,5 +41,12 @@ link "$DOTFILES/starship/starship.toml" "$HOME/.config/starship.toml"
 link "$DOTFILES/nvim" "$HOME/.config/nvim"
 link "$DOTFILES/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
 
+# The repository's own git hooks. .git/hooks is not tracked, so point git at the
+# versioned directory rather than copying anything into it.
+if [ -d "$DOTFILES/.git" ]; then
+  git -C "$DOTFILES" config core.hooksPath "$DOTFILES/.githooks"
+  echo "✓ Git hooks: core.hooksPath -> $DOTFILES/.githooks"
+fi
+
 echo
 echo "Dotfiles installed successfully."
