@@ -138,15 +138,9 @@ fi
 # Zoxide - MUST remain near the end
 eval "$(zoxide init bash)"
 
-# Start ssh-agent if needed
-if [ -z "$SSH_AUTH_SOCK" ]; then
-  eval "$(ssh-agent -s)" >/dev/null
-fi
-
-# Add the default SSH key if it exists and no identities are loaded
-if [ -f "$HOME/.ssh/id_ed25519" ] && ! ssh-add -l >/dev/null 2>&1; then
-  ssh-add ~/.ssh/id_ed25519
-fi
+# Do not start an SSH agent or load the encrypted key during shell startup.
+# Starting a new agent here causes a passphrase prompt every time a terminal
+# opens after the previous agent/socket has gone away.
 
 if [ -f "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"
