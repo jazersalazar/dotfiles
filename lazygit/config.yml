@@ -42,4 +42,4 @@ customCommands:
     context: "files"
     description: "Commit with commitizen"
     command: "cz-with-config commit"
-    subprocess: true
+    output: terminal
