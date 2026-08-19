@@ -80,6 +80,9 @@ tmux-ide() {
     local nvim_pane codex_pane shell_pane
 
     # Keep the pane open after Neovim exits so it remains available as a shell.
+    # The single quotes are deliberate: tmux runs that string through a shell of
+    # its own, which is what has to expand ${SHELL}.
+    # shellcheck disable=SC2016
     nvim_pane="$(tmux new-session -d -x "$terminal_cols" -y "$terminal_lines" -P -F '#{pane_id}' -s "$session_name" -c "$session_path" -n workspace 'nvim; exec "${SHELL:-bash}"')"
     codex_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path" codex)"
     tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" claude

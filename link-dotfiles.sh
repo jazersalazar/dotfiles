@@ -21,7 +21,8 @@ link() {
 
   # Backup an existing real file/directory or incorrect symlink
   if [ -e "$target" ] || [ -L "$target" ]; then
-    local backup="${target}.backup.$(date +%Y%m%d-%H%M%S)"
+    local backup
+    backup="${target}.backup.$(date +%Y%m%d-%H%M%S)"
     echo "Backing up: $target -> $backup"
     mv "$target" "$backup"
   fi
