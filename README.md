@@ -12,6 +12,7 @@ The installer installs the command-line tools and language runtimes used by this
 - Git and GitHub CLI
 - Optional AI coding tools: OpenAI Codex CLI and Claude Code
 - Neovim, tmux with automatic session persistence, Lazygit, and Starship
+- ShellCheck for linting the shell scripts in this repository
 - JavaScript, TypeScript, and Python debugging with `nvim-dap`, `js-debug-adapter`, `debugpy`, and `tsx`
 - PostgreSQL client tools and Neovim SQL support with Dadbod
 - CLI and build tools such as `rg`, `fd`, `fzf`, `bat`, `eza`, `jq`, `zoxide`, and GCC

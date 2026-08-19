@@ -146,6 +146,7 @@ sudo apt install -y \
   postgresql-client \
   unzip \
   zip \
+  xz-utils \
   git \
   tmux \
   ripgrep \
@@ -450,6 +451,54 @@ fi
 
 if command -v lazygit >/dev/null 2>&1; then
   echo "Lazygit: $(lazygit --version)"
+fi
+
+# ------------------------------------------------------------
+# ShellCheck
+# ------------------------------------------------------------
+
+echo
+echo "Setting up ShellCheck..."
+
+# Pinned instead of resolved from the GitHub API: that call is unauthenticated
+# and rate limited, and a linter does not need to be on the newest release.
+SHELLCHECK_VERSION="0.11.0"
+SHELLCHECK_ARCH="$(uname -m)"
+SHELLCHECK_INSTALLED_VERSION=""
+
+if command -v shellcheck >/dev/null 2>&1; then
+  SHELLCHECK_INSTALLED_VERSION="$(shellcheck --version | awk '/^version:/ {print $2}' || true)"
+fi
+
+if [ "$SHELLCHECK_INSTALLED_VERSION" = "$SHELLCHECK_VERSION" ]; then
+  echo "ShellCheck is already up to date."
+elif [ "$SHELLCHECK_ARCH" != "x86_64" ] && [ "$SHELLCHECK_ARCH" != "aarch64" ]; then
+  echo "Skipping ShellCheck: upstream publishes no build for $SHELLCHECK_ARCH."
+else
+  if [ -n "$SHELLCHECK_INSTALLED_VERSION" ]; then
+    echo "Updating ShellCheck: $SHELLCHECK_INSTALLED_VERSION -> $SHELLCHECK_VERSION"
+  else
+    echo "Installing ShellCheck..."
+  fi
+
+  (
+    SHELLCHECK_TMP="$(mktemp -d)"
+
+    trap 'rm -rf "$SHELLCHECK_TMP"' EXIT
+
+    curl -fsSL -o "$SHELLCHECK_TMP/shellcheck.tar.xz" \
+      "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${SHELLCHECK_ARCH}.tar.xz"
+
+    tar -xJf "$SHELLCHECK_TMP/shellcheck.tar.xz" -C "$SHELLCHECK_TMP"
+    mkdir -p "$HOME/.local/bin"
+    install -m 755 "$SHELLCHECK_TMP/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" "$HOME/.local/bin/shellcheck"
+  )
+
+  hash -r
+fi
+
+if command -v shellcheck >/dev/null 2>&1; then
+  echo "ShellCheck: $(shellcheck --version | awk '/^version:/ {print $2}')"
 fi
 
 # ------------------------------------------------------------
