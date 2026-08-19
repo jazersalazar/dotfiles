@@ -8,6 +8,10 @@
 # Both surfaces go through this script rather than duplicating the rule: the cz
 # function in bash/bash_aliases, and the lazygit binding, which runs commands
 # through sh and so cannot see a shell function.
+#
+# `git cz` does not: git runs the git-cz executable that uv installs beside cz in
+# preference to any alias, so it gets commitizen's own defaults unless the
+# repository carries its own config. Use `cz commit`.
 
 set -u
 

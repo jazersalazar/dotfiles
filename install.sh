@@ -478,6 +478,20 @@ echo "Setting up ShellCheck..."
 SHELLCHECK_VERSION="0.11.0"
 SHELLCHECK_ARCH="$(uname -m)"
 SHELLCHECK_INSTALLED_VERSION=""
+SHELLCHECK_SHA256=""
+SHELLCHECK_OK=true
+
+# Checked because the version is pinned, so the artefact is fixed too. The
+# vendor install scripts piped to sh elsewhere in this file cannot be pinned this
+# way: they are the upstream-supported install path and change with each release.
+case "$SHELLCHECK_ARCH" in
+  x86_64)
+    SHELLCHECK_SHA256="8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"
+    ;;
+  aarch64)
+    SHELLCHECK_SHA256="12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588"
+    ;;
+esac
 
 if command -v shellcheck >/dev/null 2>&1; then
   SHELLCHECK_INSTALLED_VERSION="$(shellcheck --version | awk '/^version:/ {print $2}' || true)"
@@ -502,12 +516,23 @@ else
     curl -fsSL -o "$SHELLCHECK_TMP/shellcheck.tar.xz" \
       "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${SHELLCHECK_ARCH}.tar.xz"
 
+    printf '%s  %s\n' "$SHELLCHECK_SHA256" "$SHELLCHECK_TMP/shellcheck.tar.xz" \
+      | sha256sum --check --quiet - \
+      || {
+        echo "ShellCheck checksum did not match; refusing to install it." >&2
+        exit 1
+      }
+
     tar -xJf "$SHELLCHECK_TMP/shellcheck.tar.xz" -C "$SHELLCHECK_TMP"
     mkdir -p "$HOME/.local/bin"
     install -m 755 "$SHELLCHECK_TMP/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" "$HOME/.local/bin/shellcheck"
-  )
+  ) || SHELLCHECK_OK=false
 
-  hash -r
+  if [ "$SHELLCHECK_OK" = true ]; then
+    hash -r
+  else
+    echo "Skipping ShellCheck: the download could not be verified."
+  fi
 fi
 
 if command -v shellcheck >/dev/null 2>&1; then

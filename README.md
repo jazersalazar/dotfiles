@@ -213,6 +213,47 @@ The installer also upgrades Lazygit when a newer official release is available.
 
 Restart the terminal afterward if shell configuration or paths changed.
 
+# Commit Conventions
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>[(scope)][!]: <description>
+```
+
+| Type | Use for |
+|---|---|
+| `feat` | A new capability |
+| `fix` | A bug fix |
+| `refactor` | Restructuring with no change in behaviour |
+| `docs` | Documentation only |
+| `chore` | Housekeeping, no source or test change |
+| `build` | Build, packaging or dependencies |
+| `style` | Formatting only |
+| `perf` | A performance improvement |
+| `test` | Tests only |
+| `ci` | CI configuration |
+| `revert` | Reverting an earlier commit |
+
+An optional lowercase scope names the area, as in `fix(tmux): stop the ticker
+stacking`. A `!` before the colon marks a breaking change.
+
+Two things enforce and assist this:
+
+- `.githooks/commit-msg` rejects a subject that does not match. `link-dotfiles.sh`
+  points `core.hooksPath` at that directory, so it installs itself on every
+  machine. Bypass a single commit with `git commit --no-verify`.
+- `commitizen` builds the message interactively. Run `cz commit` in a shell, or
+  press `C` in the lazygit files panel. Its type list is the same eleven, so the
+  wizard cannot produce a message the hook rejects.
+
+commitizen reads its configuration only from the current directory, so `.cz.toml`
+lives at the repository root and is linked to `~/.config/commitizen/cz.toml` as
+well. `bin/cz-with-config` passes that copy to `--config` when a repository has
+no configuration of its own, and leaves a project that has one alone. Prefer
+`cz commit` over `git cz`: git runs the `git-cz` executable that uv installs
+alongside `cz` in preference to any alias, which skips that fallback.
+
 # Configuration Mapping
 
 `link-dotfiles.sh` creates these symlinks:
