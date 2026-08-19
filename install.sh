@@ -179,6 +179,20 @@ if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------
+# Dotfiles
+# ------------------------------------------------------------
+
+# Linked before anything is installed: it needs no network, and a tool install
+# failing partway through then still leaves a usable shell, editor and tmux
+# rather than a machine with tools and no configuration.
+echo
+echo "Installing dotfiles..."
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+"$SCRIPT_DIR/link-dotfiles.sh"
+
+# ------------------------------------------------------------
 # Node.js / fnm
 # ------------------------------------------------------------
 
@@ -228,7 +242,9 @@ export PATH="$HOME/.local/bin:$PATH"
 
 if ! command -v uv >/dev/null 2>&1; then
   echo "Installing uv..."
-  curl -LsSf https://astral.sh/uv/install.sh | sh
+  # bash/bashrc already puts ~/.local/bin on PATH, and ~/.bashrc is a symlink
+  # into this repository by now, so let the installer not edit it.
+  curl -LsSf https://astral.sh/uv/install.sh | env INSTALLER_NO_MODIFY_PATH=1 sh
 fi
 
 echo "uv: $(uv --version)"
@@ -266,7 +282,9 @@ export PATH="$HOME/.cargo/bin:$PATH"
 if [ "$INSTALL_RUST" = true ]; then
   if ! command -v rustup >/dev/null 2>&1; then
     echo "Installing rustup..."
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    # bash/bashrc sources ~/.cargo/env itself; keep rustup out of the linked
+    # shell rc files.
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
   fi
 
   rustup default stable
@@ -477,17 +495,6 @@ else
   echo "Docker is not available inside WSL."
   echo "Install Docker Desktop on Windows and enable WSL integration."
 fi
-
-# ------------------------------------------------------------
-# Dotfiles
-# ------------------------------------------------------------
-
-echo
-echo "Installing dotfiles..."
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-"$SCRIPT_DIR/link-dotfiles.sh"
 
 # ------------------------------------------------------------
 # tmux plugins
