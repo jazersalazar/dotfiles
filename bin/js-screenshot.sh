@@ -63,6 +63,20 @@ profile="C:\\Users\\$(powershell.exe -NoProfile -Command 'Write-Output $env:USER
 # arguments rather than letting them end the string.
 psquote() { printf "%s" "$1" | sed "s/'/''/g"; }
 
+# Chrome will not open a window narrower than ~500px: ask for 375 and it lays
+# the page out at ~526 and clips the image to 375, which looks exactly like a
+# site overflowing its viewport. Media queries inside an iframe evaluate
+# against the iframe, so that is the way to render a real phone width.
+if [ "$width" -lt 500 ]; then
+	cat >&2 <<-WARN
+	screenshot: WARNING — Chrome clamps windows to ~500px wide, so a $width px
+	  window renders at ~526px and clips. The layout you get is NOT $width px.
+	  For a true narrow viewport, point this at a wrapper page instead:
+	    <iframe src="page.html" width="$width" height="1200" scrolling="no"></iframe>
+	  and screenshot the wrapper at a width above 500.
+	WARN
+fi
+
 rm -f "$out"
 
 powershell.exe -NoProfile -Command "
