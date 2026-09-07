@@ -42,6 +42,7 @@ link "$DOTFILES/nvim" "$HOME/.config/nvim"
 link "$DOTFILES/lazygit/config.yml" "$HOME/.config/lazygit/config.yml"
 link "$DOTFILES/.cz.toml" "$HOME/.config/commitizen/cz.toml"
 link "$DOTFILES/bin/cz-with-config" "$HOME/.local/bin/cz-with-config"
+link "$DOTFILES/bin/js-screenshot.sh" "$HOME/.local/bin/js-screenshot.sh"
 
 # The repository's own git hooks. .git/hooks is not tracked, so point git at the
 # versioned directory rather than copying anything into it.
