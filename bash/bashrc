@@ -84,6 +84,14 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# fnm must be initialized before aliases/functions that launch Node-installed
+# tools from tmux (including Claude Code and Codex).
+FNM_PATH="$HOME/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "$(fnm env --shell bash)"
+fi
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
@@ -107,13 +115,6 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 eval "$(starship init bash)"
-
-# fnm
-FNM_PATH="$HOME/.local/share/fnm"
-if [ -d "$FNM_PATH" ]; then
-  export PATH="$FNM_PATH:$PATH"
-  eval "$(fnm env --shell bash)"
-fi
 
 # fzf + fd integration
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -139,9 +140,30 @@ fi
 # Zoxide - MUST remain near the end
 eval "$(zoxide init bash)"
 
-# Do not start an SSH agent or load the encrypted key during shell startup.
-# Starting a new agent here causes a passphrase prompt every time a terminal
-# opens after the previous agent/socket has gone away.
+# SSH agent: reuse ONE across shells, and never load a key at startup.
+#
+# The earlier note here said not to start an agent at all, because starting a
+# fresh one per terminal meant a passphrase prompt every time one opened. That
+# is still true of the naive version. This is the other half of the fix: it
+# reuses a persistent agent via a saved socket and only spawns one when there
+# is genuinely none, so opening a terminal costs nothing.
+#
+# The key is NOT added here. `AddKeysToAgent yes` in ~/.ssh/config loads it the
+# first time something actually needs it -- one prompt, then cached for as long
+# as the agent lives.
+SSH_AGENT_ENV="$HOME/.ssh/agent.env"
+
+if [ -z "$SSH_AUTH_SOCK" ] && [ -f "$SSH_AGENT_ENV" ]; then
+  . "$SSH_AGENT_ENV" >/dev/null 2>&1
+fi
+
+# ssh-add -l exits 2 when it cannot reach an agent at all, 1 when the agent is
+# there but holds no keys. Only the first case needs a new agent.
+ssh-add -l >/dev/null 2>&1
+if [ $? -eq 2 ]; then
+  (umask 077; ssh-agent -s > "$SSH_AGENT_ENV")
+  . "$SSH_AGENT_ENV" >/dev/null 2>&1
+fi
 
 if [ -f "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"

@@ -23,6 +23,23 @@ cz() {
 tmux-ide() {
   local session_path="${1:-$PWD}"
 
+  # tmux may be running with a stale PATH, especially when fnm has switched
+  # Node versions. Add the active npm global bin explicitly so Claude Code and
+  # Codex are available when tmux starts their panes.
+  local npm_global_bin
+  npm_global_bin="$(npm prefix -g 2>/dev/null)/bin"
+  local claude_bin="$npm_global_bin/claude"
+  if [ ! -x "$claude_bin" ]; then
+    claude_bin="$(find "$npm_global_bin/../lib/node_modules/@anthropic-ai/claude-code" -type f -path '*/claude-code-linux-x64/claude' -perm -111 2>/dev/null | head -n 1)"
+  fi
+  if [ -n "$claude_bin" ] && [ -x "$claude_bin" ]; then
+    export CLAUDE_CODE_BIN="$claude_bin"
+    export PATH="$(dirname "$claude_bin"):$PATH"
+  fi
+  if [ -x "$npm_global_bin/claude" ] || [ -x "$npm_global_bin/codex" ]; then
+    export PATH="$npm_global_bin:$PATH"
+  fi
+
   if ! session_path="$(cd -- "$session_path" 2>/dev/null && pwd -P)"; then
     printf 'tmux-ide: directory does not exist: %s\n' "$session_path" >&2
     return 1
@@ -37,7 +54,7 @@ tmux-ide() {
   local session_name="ide-${session_key}"
   # Bump when the layout below changes, so existing sessions get rebuilt on the
   # next tmux-ide instead of keeping the old arrangement forever.
-  local layout_version="13"
+  local layout_version="14"
 
   # Maximize before creating the detached session so tmux calculates pane
   # percentages from the terminal's final dimensions.
@@ -66,7 +83,7 @@ tmux-ide() {
     nvim_pane="$(tmux display-message -p '#{pane_id}')"
     tmux rename-window -t "$current_window" workspace
     codex_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path" codex)"
-    tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" claude
+    tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" "${CLAUDE_CODE_BIN:-claude}"
     shell_pane="$(tmux split-window -v -p 35 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path")"
     tmux split-window -h -p 50 -t "$shell_pane" -c "$session_path" lazygit
     tmux resize-pane -t "$codex_pane" -x 30%
@@ -95,7 +112,7 @@ tmux-ide() {
     # shellcheck disable=SC2016
     nvim_pane="$(tmux new-session -d -x "$terminal_cols" -y "$terminal_lines" -P -F '#{pane_id}' -s "$session_name" -c "$session_path" -n workspace 'nvim; exec "${SHELL:-bash}"')"
     codex_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path" codex)"
-    tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" claude
+    tmux split-window -v -p 50 -t "$codex_pane" -c "$session_path" "${CLAUDE_CODE_BIN:-claude}"
     shell_pane="$(tmux split-window -v -p 35 -P -F '#{pane_id}' -t "$nvim_pane" -c "$session_path")"
     tmux split-window -h -p 50 -t "$shell_pane" -c "$session_path" lazygit
 
