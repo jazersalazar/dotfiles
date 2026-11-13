@@ -300,6 +300,21 @@ The layout uses a wide left column: Neovim occupies its upper 65%, with a shell 
 tmux-ide ~/projects/my-app
 ```
 
+Start the AI layout matching the current workspace:
+
+```bash
+tmux-ide-ai
+tmux-ide-ai ~/projects/my-app
+```
+
+Codex fills the left 70%. The right 30% has Claude Code above a shell, split 70/30 vertically. Like `tmux-ide`, it reattaches to a persistent session per project when launched outside tmux. Its sessions are separate from `tmux-ide`. Inside tmux, run it in a one-pane window (`Ctrl+b`, then `c`).
+
+Close all other panes in the current window, keeping the pane where you run it (programs in the closed panes are terminated):
+
+```bash
+tmux-clear
+```
+
 Close the current tmux window with one command:
 
 ```bash

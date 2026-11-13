@@ -115,6 +115,114 @@ tmux-ide() {
   tmux attach-session -t "=$session_name"
 }
 
+tmux-ide-ai() {
+  local session_path="${1:-$PWD}"
+
+  # tmux may be running with a stale PATH, especially when fnm has switched
+  # Node versions. Add the active npm global bin explicitly so Claude Code and
+  # Codex are available when tmux starts their panes.
+  local npm_global_bin
+  npm_global_bin="$(npm prefix -g 2>/dev/null)/bin"
+  local claude_bin="$npm_global_bin/claude"
+  if [ ! -x "$claude_bin" ]; then
+    claude_bin="$(find "$npm_global_bin/../lib/node_modules/@anthropic-ai/claude-code" -type f -path '*/claude-code-linux-x64/claude' -perm -111 2>/dev/null | head -n 1)"
+  fi
+  if [ -n "$claude_bin" ] && [ -x "$claude_bin" ]; then
+    export CLAUDE_CODE_BIN="$claude_bin"
+    export PATH="$(dirname "$claude_bin"):$PATH"
+  fi
+  if [ -x "$npm_global_bin/claude" ] || [ -x "$npm_global_bin/codex" ]; then
+    export PATH="$npm_global_bin:$PATH"
+  fi
+
+  if ! session_path="$(cd -- "$session_path" 2>/dev/null && pwd -P)"; then
+    printf 'tmux-ide-ai: directory does not exist: %s\n' "$session_path" >&2
+    return 1
+  fi
+  local session_key
+  session_key="$(printf '%s' "$session_path" | cksum | cut -d ' ' -f 1)"
+  # One session per project directory, keyed by a hash of its resolved path, so
+  # running tmux-ide-ai again in the same project reattaches instead of piling up
+  # another session. Every target below uses tmux's "=" exact-match prefix:
+  # without it one key that is a prefix of another would match the wrong
+  # session.
+  local session_name="ide-ai-${session_key}"
+  # Bump when the layout below changes, so existing sessions get rebuilt on the
+  # next tmux-ide-ai instead of keeping the old arrangement forever.
+  local layout_version="1"
+
+  # Maximize before creating the detached session so tmux calculates pane
+  # percentages from the terminal's final dimensions.
+  printf '\033[9;1t'
+  sleep 0.2
+  local terminal_cols terminal_lines
+  terminal_cols="$(tput cols)"
+  terminal_lines="$(tput lines)"
+
+  # A tmux server keeps its own environment. Refresh PATH so tools installed
+  # during this shell session (including Codex and Claude) work immediately.
+  tmux set-environment -g PATH "$PATH"
+
+  # When already inside tmux, turn the current one-pane window into the IDE.
+  # This keeps one client and one status bar instead of attaching nested tmux.
+  if [ -n "${TMUX:-}" ]; then
+    local current_window pane_count codex_pane claude_pane
+    current_window="$(tmux display-message -p '#{session_name}:#{window_index}')"
+    pane_count="$(tmux display-message -p '#{window_panes}')"
+
+    if [ "$pane_count" -ne 1 ]; then
+      printf 'tmux-ide-ai: current window already has %s panes; open an empty window with Prefix + c first\n' "$pane_count" >&2
+      return 1
+    fi
+
+    codex_pane="$(tmux display-message -p '#{pane_id}')"
+    tmux rename-window -t "$current_window" workspace
+    claude_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$codex_pane" -c "$session_path" "${CLAUDE_CODE_BIN:-claude}")"
+    tmux split-window -v -p 30 -t "$claude_pane" -c "$session_path"
+    tmux select-pane -t "$codex_pane"
+
+    cd -- "$session_path" || return 1
+    codex
+    return
+  fi
+
+  # A session built by an older layout is rebuilt rather than reattached.
+  if tmux has-session -t "=$session_name" 2>/dev/null \
+    && [ "$(tmux show-options -t "=$session_name:" -qv @ide-layout-version)" != "$layout_version" ]; then
+    tmux kill-session -t "=$session_name"
+  fi
+
+  if ! tmux has-session -t "=$session_name" 2>/dev/null; then
+    # Codex fills the left 70%; Claude sits above a shell on the right.
+    local codex_pane claude_pane
+
+    # Keep the pane available as a shell after Codex exits.
+    # shellcheck disable=SC2016
+    codex_pane="$(tmux new-session -d -x "$terminal_cols" -y "$terminal_lines" -P -F '#{pane_id}' -s "$session_name" -c "$session_path" -n workspace 'codex; exec "${SHELL:-bash}"')"
+    claude_pane="$(tmux split-window -h -p 30 -P -F '#{pane_id}' -t "$codex_pane" -c "$session_path" "${CLAUDE_CODE_BIN:-claude}")"
+    tmux split-window -v -p 30 -t "$claude_pane" -c "$session_path"
+    tmux select-pane -t "$codex_pane"
+    tmux set-option -t "=$session_name:" @ide-layout-version "$layout_version"
+  fi
+
+  # A reattached session may have been left zoomed on one pane; the IDE is meant
+  # to open on the full layout.
+  if [ "$(tmux display-message -p -t "=$session_name:workspace" '#{window_zoomed_flag}')" = 1 ]; then
+    tmux resize-pane -Z -t "=$session_name:workspace.1"
+  fi
+
+  tmux attach-session -t "=$session_name"
+}
+
+tmux-clear() {
+  if [ -z "${TMUX:-}" ] || [ -z "${TMUX_PANE:-}" ]; then
+    printf 'tmux-clear: run this inside a tmux pane\n' >&2
+    return 1
+  fi
+
+  tmux kill-pane -a -t "$TMUX_PANE"
+}
+
 tmux-close() {
   tmux kill-window
 }
